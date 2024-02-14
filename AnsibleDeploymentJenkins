@@ -1,0 +1,20 @@
+pipeline {
+    agent { label 'enter label here'}
+    environment {
+        VAULT = credentials('enter credentials here')
+        PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
+        
+    }
+    stages {
+        stage('run Ansible') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'NameOfCredentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]){
+                copyArtifacts 'You can copy artifact from other jenkins job'
+                sh ('echo "${VAULT}" > vault.txt') # can be replaced by usage of withCredentials as per line 11
+                sh 'ansible-playbook playbooks/nameofplaybook.yml -i inventories/TE/hosts.yml --limit=nameofhost --vault-password-file vault.txt --extra-vars ansible_sudo_pass=$PASSWORD'
+                } 
+            }
+        }
+    }
+}
+
